@@ -17,6 +17,14 @@ Class Main extends PluginBase{
     $this->getLogger()->notice("§e§lSurvivalCore ENABLE");
   }
   
+  public function checkFormAPI() : bool {
+    if($this->getServer()->getPluginManager()->getPlugin("FormAPI") === null || $this->getServer()->getPluginManager()->getPlugin("FormAPI")->isDisabled()){
+      $this->getServer()->getPluginLoader()->disable($this);
+      $this->getLogger()->error("[Error] กรุณาลง ปลั้กอิน 'FormAPI' เพื่อดำเนินการทำงานของปลั้กอินนี้แบบสมบูรณ์");
+      return false;
+    }
+  }
+  
   public function onCommand(CommandSender $sender, Command $command, String $label, array $args) : bool {
     switch($command->getName()){
       case "ruleui":
@@ -41,5 +49,22 @@ Class Main extends PluginBase{
           $sender->setGamemode(2);
         $sender->sendMessage("§eChange gamemode§a Adventure mode §eor §agamemode 2");
     }
+  }
+  
+  public function ruleUI($sender){
+    $formapi = $this->getServer()->getPluginManager()->getPlugin("FormAPI");
+    $form = $formapi->createSimpleForm(function(Player $sender, $data){
+      $result = $data;
+      if($result === null){
+      }
+      switch($result){
+        case 0:
+          $sender->addTitle("§aขอบคุณได้รับฟัง", "§eกรุณาทำตามข้อตกลงของเซิฟเวอร์!");
+          break;
+      }
+    });
+    $form->setTitle("§7§lRuleUI");
+    $form->setContent($this->getConfig()->get("rule-content"));
+    $form->addButton("Submit");
   }
 }
